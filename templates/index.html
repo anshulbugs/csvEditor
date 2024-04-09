@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 600px;
+            margin: 50px auto;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        input[type="file"] {
+            width: 300px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #loadingMsg {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+            font-style: italic;
+            color: #888;
+        }
+
+        #successMsg {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+            color: #4CAF50;
+        }
+
+        #downloadBtn {
+            display: none;
+            margin-top: 20px;
+            text-align: center;
+            margin-left: auto; 
+            margin-right: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>CSV Generator</h1>
+        <form id="csvForm" enctype="multipart/form-data">
+            <label for="contact_file">Upload Contact Details CSV:</label>
+            <input type="file" id="contact_file" name="contact_file" accept=".csv"><br>
+            <label for="company_file">Upload Company Details CSV:</label>
+            <input type="file" id="company_file" name="company_file" accept=".csv"><br>
+            <button id="uploadBtn">Create New CSV</button>
+        </form>
+        <div id="loadingMsg">Processing Files...</div>
+        <div id="successMsg">CSV File Created Successfully!</div>
+        <button id="downloadBtn" onclick="downloadFile()">Download Merged CSV</button>
+    </div>
+
+    <script>
+        var uploadBtn = document.getElementById('uploadBtn');
+        var loadingMsg = document.getElementById('loadingMsg');
+        var successMsg = document.getElementById('successMsg');
+        var downloadBtn = document.getElementById('downloadBtn');
+        var form = document.getElementById('csvForm');
+        var contactFileInput = document.getElementById('contact_file');
+        var companyFileInput = document.getElementById('company_file');
+
+        uploadBtn.addEventListener('click', function(event) {
+            event.preventDefault();
+
+            var contactFile = contactFileInput.files[0];
+            var companyFile = companyFileInput.files[0];
+
+            if (!contactFile || !companyFile) {
+                alert('Please upload both contact and company CSV files.');
+                return;
+            }
+
+            form.style.display = 'block';
+            loadingMsg.style.display = 'block';
+            successMsg.style.display = 'none';
+            downloadBtn.style.display = 'none';
+
+            var formData = new FormData();
+            formData.append('contact_file', contactFile);
+            formData.append('company_file', companyFile);
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/upload', true);
+
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    loadingMsg.style.display = 'none';
+                    successMsg.style.display = 'block';
+                    downloadBtn.style.display = 'block';
+                    form.reset();
+                } else {
+                    console.error('Request failed with status:', xhr.status);
+                    loadingMsg.style.display = 'none';
+                    // Display error message to the user
+                }
+            };
+
+            xhr.onerror = function() {
+                console.error('Request failed');
+                loadingMsg.style.display = 'none';
+                // Display error message to the user
+            };
+
+            xhr.send(formData);
+        });
+
+        function downloadFile() {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/download', true);
+            xhr.responseType = 'blob';
+
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    var blob = new Blob([xhr.response], { type: 'text/csv' });
+                    var downloadLink = document.createElement('a');
+                    downloadLink.href = URL.createObjectURL(blob);
+                    downloadLink.download = 'final_merged.csv';
+                    downloadLink.click();
+                } else {
+                    console.error('Request failed with status:', xhr.status);
+                    // Display error message to the user
+                }
+                downloadBtn.style.display = 'none';
+            };
+
+            xhr.onerror = function() {
+                console.error('Request failed');
+                // Display error message to the user
+            };
+
+            xhr.send();
+        }
+    </script>
+</body>
+</html>
