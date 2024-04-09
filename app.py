@@ -41,9 +41,9 @@ def merge_csv(contact_file, company_file):
         'PoW': merged_df['Company Name'],
         'Jt': merged_df['Job Title_y'],
         'Job Posting On LinkedIn': merged_df['LI Job Post URL'],
-        'Landing Page': ' ',  # Blank space
-        'YouTube Scroll': '   ',  # Blank space
-        'ApTask Scrolling': '   '  # Blank space
+        'Landing Page': 'https://www.aptask.com/chat/eddie-bright-jr/',
+        'YouTube Scroll': 'https://www.aptask.com/',
+        'ApTask Scrolling': 'https://www.aptask.com/'
     })
 
     return final_df
