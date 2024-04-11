@@ -13,13 +13,13 @@ def merge_csv(contact_file, company_file):
     # Read CSV files
     contacts_df = pd.read_csv(contact_file)
     companies_df = pd.read_csv(company_file)
-    # Remove the "Company" column from the companies DataFrame
-    if 'Company' in companies_df.columns:
-        companies_df.rename(columns={'Company': 'Company Name'}, inplace=True)
+    # # Remove the "Company" column from the companies DataFrame
+    # if 'Company' in companies_df.columns:
+    #     companies_df.rename(columns={'Company': 'Company Name'}, inplace=True)
     
-    # Rename columns for consistency
-    contacts_df.rename(columns={'Company Domain': 'Company'}, inplace=True)
-    companies_df.rename(columns={'Find Domain from Company Name': 'Company'}, inplace=True)
+    # # Rename columns for consistency
+    # contacts_df.rename(columns={'Company Domain': 'Company'}, inplace=True)
+    # companies_df.rename(columns={'Find Domain from Company Name': 'Company'}, inplace=True)
     
     # Merge based on the matching Company column
     merged_df = pd.merge(contacts_df, companies_df, on='Company')
@@ -38,9 +38,9 @@ def merge_csv(contact_file, company_file):
         'Designation': merged_df['Job Title_x'],
         'Name_2': merged_df['First Name'],
         'LinkedIn Profile': merged_df['LinkedIn Profile'],
-        'PoW': merged_df['Company Name'],
+        'PoW': merged_df['Company'],
         'Jt': merged_df['Job Title_y'],
-        'Job Posting On LinkedIn': merged_df['LI Job Post URL'],
+        'Job Posting On LinkedIn': merged_df['LI Job Post URL'].str.slice(0, 45),
         'Landing Page': 'https://www.aptask.com/chat/eddie-bright-jr/',
         'YouTube Scroll': 'https://www.aptask.com/',
         'ApTask Scrolling': 'https://www.aptask.com/'
@@ -77,7 +77,7 @@ def upload():
     merged_df = merge_csv(contact_filename, company_filename)
 
     # Write the merged data to a temporary CSV file
-    temp_csv_filename = os.path.join(tempfile.mkdtemp(), 'final_merged.csv')
+    temp_csv_filename = os.path.join(tempfile.mkdtemp(), 'result.csv')
     merged_df.to_csv(temp_csv_filename, index=False)
 
     # No need to return anything on upload

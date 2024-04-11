@@ -90,11 +90,11 @@
             <input type="file" id="contact_file" name="contact_file" accept=".csv"><br>
             <label for="company_file">Upload Company Details CSV:</label>
             <input type="file" id="company_file" name="company_file" accept=".csv"><br>
-            <button id="uploadBtn">Create New CSV</button>
+            <button id="uploadBtn">Create CSV</button>
         </form>
         <div id="loadingMsg">Processing Files...</div>
         <div id="successMsg">CSV File Created Successfully!</div>
-        <button id="downloadBtn" onclick="downloadFile()">Download Merged CSV</button>
+        <button id="downloadBtn" onclick="downloadFile()">Download CSV</button>
     </div>
 
     <script>
@@ -161,7 +161,7 @@
                     var blob = new Blob([xhr.response], { type: 'text/csv' });
                     var downloadLink = document.createElement('a');
                     downloadLink.href = URL.createObjectURL(blob);
-                    downloadLink.download = 'final_merged.csv';
+                    downloadLink.download = 'Result.csv';
                     downloadLink.click();
                 } else {
                     console.error('Request failed with status:', xhr.status);
