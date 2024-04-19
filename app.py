@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, send_file
+from flask import Flask, render_template, request, redirect, send_file ,make_response
 import pandas as pd
 import os
 import tempfile
@@ -89,6 +89,27 @@ def download():
     
     # Return the merged CSV file as a response
     return send_file(temp_csv_filename, as_attachment=True)
+@app.route('/process_csv', methods=['POST'])
+def process_csv():
+    data = request.files['file']
+    # Read the CSV file
+    df = pd.read_csv(data)
 
+    # Select the desired columns
+    filtered_df = df[[ 'name', 'designation', 'pow', 'jt','thumbnail', 'url']]
+
+    # Create the 'landing page' column
+    filtered_df['landing page'] = 'https://www.aptask.com/gan/?video_id=' + filtered_df['url'].str.extract(r'video\.gan\.ai\/([a-zA-Z0-9_-]+)$', expand=False)
+
+    filtered_df = filtered_df[['name', 'designation', 'pow', 'jt', 'landing page', 'thumbnail', 'url']]
+    # Convert the filtered DataFrame to a CSV string
+    csv_data = filtered_df.to_csv(index=False)
+
+    # Create a response object with the CSV data
+    response = make_response(csv_data)
+    response.headers['Content-Type'] = 'text/csv'
+    response.headers['Content-Disposition'] = 'attachment; filename=Gan.csv'
+
+    return response
 if __name__ == '__main__':
     app.run(debug=True)

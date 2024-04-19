@@ -13,38 +13,44 @@
         }
 
         .container {
-            width: 600px;
+            width: 800px;
             margin: 50px auto;
             background-color: #fff;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             padding: 20px;
-            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
         }
 
-        h1 {
+        .column {
+            width: 45%;
+        }
+
+        .column h2 {
             text-align: center;
             color: #333;
         }
 
-        form {
+        .column form {
             text-align: center;
         }
 
-        label {
+        .column label {
             display: block;
             margin-bottom: 10px;
         }
 
-        input[type="file"] {
-            width: 300px;
+        .column input[type="file"] {
+            width: 90%;
             padding: 10px;
             border-radius: 5px;
             border: 1px solid #ccc;
             margin-bottom: 20px;
         }
 
-        button {
+        .column button {
             background-color: #4CAF50;
             color: white;
             padding: 15px 20px;
@@ -54,25 +60,15 @@
             transition: background-color 0.3s ease;
         }
 
-        button:hover {
+        .column button:hover {
             background-color: #45a049;
         }
 
-        #loadingMsg {
+        #loadingMsg, #successMsg {
             display: none;
             text-align: center;
             margin-top: 20px;
-            font-style: italic;
-            color: #888;
         }
-
-        #successMsg {
-            display: none;
-            text-align: center;
-            margin-top: 20px;
-            color: #4CAF50;
-        }
-
         #downloadBtn {
             display: none;
             margin-top: 20px;
@@ -80,21 +76,34 @@
             margin-left: auto; 
             margin-right: auto;
         }
+
+        #successMsg {
+            color: #4CAF50;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>CSV Generator</h1>
-        <form id="csvForm" enctype="multipart/form-data">
-            <label for="contact_file">Upload Contact Details CSV:</label>
-            <input type="file" id="contact_file" name="contact_file" accept=".csv"><br>
-            <label for="company_file">Upload Company Details CSV:</label>
-            <input type="file" id="company_file" name="company_file" accept=".csv"><br>
-            <button id="uploadBtn">Create CSV</button>
+        <div class="column">
+            <h2>CSV Instantly</h2>
+            <form id="csvForm" enctype="multipart/form-data">
+                <label for="contact_file">Upload Contact Details CSV:</label>
+                <input type="file" id="contact_file" name="contact_file" accept=".csv"><br>
+                <label for="company_file">Upload Company Details CSV:</label>
+                <input type="file" id="company_file" name="company_file" accept=".csv"><br>
+                <button id="uploadBtn">Create CSV</button>
+            </form>
+            <div id="loadingMsg">Processing Files...</div>
+            <div id="successMsg">CSV File Created Successfully!</div>
+            <button id="downloadBtn" onclick="downloadFile()">Download CSV</button>
+        </div>
+        <div class="column">
+            <h2>CSV Gan</h2>
+            <form action="/process_csv" method="post" enctype="multipart/form-data">
+            <input type="file" name="file" accept=".csv"><br>
+            <button type="submit">Generate csv</button>
         </form>
-        <div id="loadingMsg">Processing Files...</div>
-        <div id="successMsg">CSV File Created Successfully!</div>
-        <button id="downloadBtn" onclick="downloadFile()">Download CSV</button>
+        </div>
     </div>
 
     <script>
