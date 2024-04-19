@@ -29,21 +29,21 @@ def merge_csv(contact_file, company_file):
 
     # Create the final DataFrame with the specified column names and values
     final_df = pd.DataFrame({
-        'Serial Number': merged_df['Serial Number'],
-        'Recipient': merged_df['First Name'],
-        'Mobile Number': np.nan,  # Blank for now
-        'Email': merged_df['Email - Person'].fillna(merged_df['Personal Email']),
-        'Unique ID': np.random.randint(100000, 999999, size=len(merged_df)),  # Random number generator
-        'Name_1': merged_df['First Name'],
-        'Designation': merged_df['Job Title_x'],
-        'Name_2': merged_df['First Name'],
-        'LinkedIn Profile': merged_df['LinkedIn Profile'],
-        'PoW': merged_df['Company'],
-        'Jt': merged_df['Job Title_y'],
-        'Job Posting On LinkedIn': merged_df['LI Job Post URL'].str.slice(0, 45),
-        'Landing Page': 'https://www.aptask.com/chat/eddie-bright-jr/',
-        'YouTube Scroll': 'https://www.aptask.com/',
-        'ApTask Scrolling': 'https://www.aptask.com/'
+        ' ': merged_df['Serial Number'],
+        'recipient': merged_df['First Name'],
+        'mobile_number': np.nan,  # Blank for now
+        'email': merged_df['Email - Person'].fillna(merged_df['Personal Email']),
+        'unique_id': np.random.randint(100000, 999999, size=len(merged_df)),  # Random number generator
+        'name': merged_df['First Name'],
+        'designation': merged_df['Job Title_x'],
+        # 'Name_2': merged_df['First Name'],
+        'pow': merged_df['Company'],
+        'jt': merged_df['Job Title_y'],
+        'LinkedIn Profile ': merged_df['LinkedIn Profile'],
+        'Job Posting': merged_df['LI Job Post URL'].str.slice(0, 45),
+        # 'Landing Page': 'https://www.aptask.com/chat/eddie-bright-jr/',
+        # 'YouTube Scroll': 'https://www.aptask.com/',
+        'ApTask Scroll': 'https://www.aptask.com/'
     })
 
     return final_df
@@ -94,14 +94,18 @@ def process_csv():
     data = request.files['file']
     # Read the CSV file
     df = pd.read_csv(data)
+    if 'name' in df.columns:
+        name_column = 'name'
+    else:
+        name_column = 'name_1'
 
     # Select the desired columns
-    filtered_df = df[[ 'name', 'designation', 'pow', 'jt','thumbnail', 'url']]
+    filtered_df = df[[ name_column, 'designation', 'pow', 'jt','thumbnail', 'url']]
 
     # Create the 'landing page' column
     filtered_df['landing page'] = 'https://www.aptask.com/gan/?video_id=' + filtered_df['url'].str.extract(r'video\.gan\.ai\/([a-zA-Z0-9_-]+)$', expand=False)
 
-    filtered_df = filtered_df[['name', 'designation', 'pow', 'jt', 'landing page', 'thumbnail', 'url']]
+    filtered_df = filtered_df[[name_column, 'designation', 'pow', 'jt', 'landing page', 'thumbnail', 'url']]
     # Convert the filtered DataFrame to a CSV string
     csv_data = filtered_df.to_csv(index=False)
 
