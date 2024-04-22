@@ -23,16 +23,28 @@ def merge_csv(contact_file, company_file):
     
     # Merge based on the matching Company column
     merged_df = pd.merge(contacts_df, companies_df, on='Company')
-
+    # Check if all the columns exists
+    required_columns = ['First Name', 'Last Name', 'Job Title_x', 'Job Title_y', 'Personal Email','Email - Person', 'Company', 'LinkedIn Profile', 'LI Job Post URL']
+    for column in required_columns:
+        if column not in merged_df.columns:
+            return 'Error: The CSV file does not have a "{}" column.'.format(column), 400
     # Add a serial number column starting from 1 to the number of rows
     merged_df.insert(0, 'Serial Number', range(1, len(merged_df) + 1))
-
+    #print columns of mergde_df
+    # print(merged_df.columns)
+    # print("merged_df['Personal Email']",merged_df['Personal Email'])
+    merged_df['Personal Email new'] = merged_df['Personal Email'].str.replace('❌ No Email Found', '')
+    # print("merged_df['Personal Email new']",merged_df['Personal Email new'])
+    merged_df['Personal Email new'] = merged_df['Personal Email new'].str.replace('✅ ', '')
+    # print("merged_df['Personal Email new']",merged_df['Personal Email new'].head(40))
+    # print("merged_df['Personal Email']",merged_df['Personal Email new'])
     # Create the final DataFrame with the specified column names and values
     final_df = pd.DataFrame({
         ' ': merged_df['Serial Number'],
         'recipient': merged_df['First Name'],
         'mobile_number': np.nan,  # Blank for now
-        'email': merged_df['Email - Person'].fillna(merged_df['Personal Email']),
+        # 'email': merged_df['Email - Person'],       
+        'email': merged_df['Email - Person'].fillna(merged_df['Personal Email new']),
         'unique_id': np.random.randint(100000, 999999, size=len(merged_df)),  # Random number generator
         'name': merged_df['First Name'],
         'designation': merged_df['Job Title_x'],
@@ -98,15 +110,20 @@ def process_csv():
         name_column = 'name'
     else:
         name_column = 'name_1'
-
+    # Check if all the columns exists
+    required_columns = [name_column, 'designation', 'pow', 'jt', 'thumbnail', 'url', 'email']
+    for column in required_columns:
+        if column not in df.columns:
+            return 'Error: The CSV file does not have a "{}" column.'.format(column), 400
+        
     # Select the desired columns
-    filtered_df = df[[ name_column, 'designation', 'pow', 'jt','thumbnail', 'url']]
+    filtered_df = df[[ name_column, 'designation', 'pow', 'jt','thumbnail', 'url','email']]
     # print(filtered_df['url'])
     # print(filtered_df['url'].str.extract(r'video\.gan\.ai\/([a-zA-Z0-9_-]+)$', expand=False))
     # Create the 'landing page' column
     filtered_df['landing page'] = 'https://www.aptask.com/gan/?video_id=' + df['url'].apply(lambda x: x.split('/')[-1])
 
-    filtered_df = filtered_df[[name_column, 'designation', 'pow', 'jt', 'landing page', 'thumbnail', 'url']]
+    filtered_df = filtered_df[[name_column,'email', 'designation', 'pow', 'jt', 'landing page', 'thumbnail', 'url']]
     # Convert the filtered DataFrame to a CSV string
     csv_data = filtered_df.to_csv(index=False)
 
