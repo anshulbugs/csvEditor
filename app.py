@@ -119,7 +119,9 @@ def process_csv():
     # Create the 'landing page' column
     filtered_df['landing page'] = 'https://www.aptask.com/gan/?video_id=' + df['url'].apply(lambda x: x.split('/')[-1])
 
-    filtered_df = filtered_df[[name_column,'email', 'designation', 'pow', 'jt', 'landing page', 'thumbnail', 'url']]
+    # filtered_df = filtered_df[[name_column,'email', 'designation', 'pow', 'jt', 'landing page', 'thumbnail', 'url']]
+
+    filtered_df = filtered_df[[name_column,'email', 'designation', 'pow', 'jt', 'landing page', 'thumbnail']]
     # Convert the filtered DataFrame to a CSV string
     csv_data = filtered_df.to_csv(index=False)
 
