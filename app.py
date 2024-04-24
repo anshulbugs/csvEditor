@@ -3,7 +3,7 @@ import pandas as pd
 import os
 import tempfile
 import numpy as np
-
+import requests
 app = Flask(__name__)
 
 # Global variable to store the temporary file name
@@ -13,44 +13,40 @@ def merge_csv(contact_file, company_file):
     # Read CSV files
     contacts_df = pd.read_csv(contact_file)
     companies_df = pd.read_csv(company_file)
-    # # Remove the "Company" column from the companies DataFrame
-    # if 'Company' in companies_df.columns:
-    #     companies_df.rename(columns={'Company': 'Company Name'}, inplace=True)
     
-    # # Rename columns for consistency
-    # contacts_df.rename(columns={'Company Domain': 'Company'}, inplace=True)
-    # companies_df.rename(columns={'Find Domain from Company Name': 'Company'}, inplace=True)
     
     # Merge based on the matching Company column
-    merged_df = pd.merge(contacts_df, companies_df, on='Company')
+    merged_df = pd.merge(contacts_df, companies_df, on='Company Name')
+    print("merged_df",merged_df.columns)
     # Check if all the columns exists
-    required_columns = ['First Name', 'Last Name', 'Job Title_x', 'Job Title_y', 'Personal Email','Email - Person', 'Company', 'LinkedIn Profile', 'LI Job Post URL']
-    for column in required_columns:
-        if column not in merged_df.columns:
-            return 'Error: The CSV file does not have a "{}" column.'.format(column), 400
+    # required_columns = ['First Name', 'Last Name', 'Job Title_x', 'Job Title_y', 'Personal Email','Email - Person', 'Company', 'LinkedIn Profile', 'LI Job Post URL']
+    # for column in required_columns:
+    #     if column not in merged_df.columns:
+    #         return 'Error: The CSV file does not have a "{}" column.'.format(column), 400
     # Add a serial number column starting from 1 to the number of rows
     merged_df.insert(0, 'Serial Number', range(1, len(merged_df) + 1))
     #print columns of mergde_df
     # print(merged_df.columns)
     # print("merged_df['Personal Email']",merged_df['Personal Email'])
-    merged_df['Personal Email new'] = merged_df['Personal Email'].str.replace('❌ No Email Found', '')
+    merged_df['Work Email 2 new'] = merged_df['Work Email 2'].str.replace('❌ No Email Found', '')
     # print("merged_df['Personal Email new']",merged_df['Personal Email new'])
-    merged_df['Personal Email new'] = merged_df['Personal Email new'].str.replace('✅ ', '')
+    merged_df['Work Email 2 new'] = merged_df['Work Email 2 new'].str.replace('✅ ', '')
     # print("merged_df['Personal Email new']",merged_df['Personal Email new'].head(40))
     # print("merged_df['Personal Email']",merged_df['Personal Email new'])
     # Create the final DataFrame with the specified column names and values
+    
     final_df = pd.DataFrame({
         ' ': merged_df['Serial Number'],
         'recipient': merged_df['First Name'],
         'mobile_number': np.nan,  # Blank for now
         # 'email': merged_df['Email - Person'],       
-        'email': merged_df['Email - Person'].fillna(merged_df['Personal Email new']),
+        'email': merged_df['Work Email 1'].fillna(merged_df['Work Email 2 new']),
         'unique_id': np.random.randint(100000, 999999, size=len(merged_df)),  # Random number generator
         'name': merged_df['First Name'],
-        'designation': merged_df['Job Title_x'],
+        'designation': merged_df['Designation'],
         # 'Name_2': merged_df['First Name'],
-        'pow': merged_df['Company'],
-        'jt': merged_df['Job Title_y'],
+        'pow': merged_df['Company Name'],
+        'jt': merged_df['Job Title'],
         'LinkedIn Profile ': merged_df['LinkedIn Profile'],
         'Job Posting': merged_df['LI Job Post URL'].str.slice(0, 45),
         # 'Landing Page': 'https://www.aptask.com/chat/eddie-bright-jr/',
