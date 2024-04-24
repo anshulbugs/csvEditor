@@ -117,7 +117,7 @@ def process_csv():
     # print(filtered_df['url'])
     # print(filtered_df['url'].str.extract(r'video\.gan\.ai\/([a-zA-Z0-9_-]+)$', expand=False))
     # Create the 'landing page' column
-    filtered_df['landing page'] = 'https://www.aptask.com/gan/?video_id=' + df['url'].apply(lambda x: x.split('/')[-1])
+    filtered_df['landing page'] = 'https://www.aptask.com/gan/?video_id=' + df['url'].apply(lambda x: x.split('/')[-1] if isinstance(x, str) else '')
 
     # filtered_df = filtered_df[[name_column,'email', 'designation', 'pow', 'jt', 'landing page', 'thumbnail', 'url']]
 
