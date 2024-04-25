@@ -11,8 +11,13 @@ temp_csv_filename = None
 
 def merge_csv(contact_file, company_file):
     # Read CSV files
-    contacts_df = pd.read_csv(contact_file)
-    companies_df = pd.read_csv(company_file)
+    contacts_df = pd.read_csv(contact_file, skip_blank_lines=True)
+    companies_df = pd.read_csv(company_file, skip_blank_lines=True)
+
+    # Remove rows with all NaN values
+    contacts_df.dropna(how='all', inplace=True)
+    companies_df.dropna(how='all', inplace=True)
+
     
     
     # Merge based on the matching Company column
@@ -100,8 +105,12 @@ def download():
 @app.route('/process_csv', methods=['POST'])
 def process_csv():
     data = request.files['file']
-    # Read the CSV file
-    df = pd.read_csv(data)
+    
+    # Read the CSV file, skipping empty lines
+    df = pd.read_csv(data, skip_blank_lines=True)
+
+    # Remove rows with all NaN values
+    df.dropna(how='all', inplace=True)
     if 'name' in df.columns:
         name_column = 'name'
     else:
@@ -117,7 +126,7 @@ def process_csv():
     # print(filtered_df['url'])
     # print(filtered_df['url'].str.extract(r'video\.gan\.ai\/([a-zA-Z0-9_-]+)$', expand=False))
     # Create the 'landing page' column
-    filtered_df['landing page'] = 'https://www.aptask.com/gan/?video_id=' + df['url'].apply(lambda x: x.split('/')[-1])
+    filtered_df['landing page'] = 'https://www.aptask.com/gan/?video_id=' + df['url'].apply(lambda x: x.split('/')[-1] if isinstance(x, str) else '')
 
     # filtered_df = filtered_df[[name_column,'email', 'designation', 'pow', 'jt', 'landing page', 'thumbnail', 'url']]
 
