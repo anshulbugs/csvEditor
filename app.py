@@ -140,5 +140,63 @@ def process_csv():
     response.headers['Content-Disposition'] = 'attachment; filename=Gan.csv'
 
     return response
+
+
+@app.route('/process_csv_without_linkedin', methods=['POST'])
+def process_csv_without_linkedin():
+    # Check if the post request has the file part
+    if 'contact_file1' not in request.files or 'company_file1' not in request.files:
+        return redirect(request.url)
+    
+    contact_file = request.files['contact_file1']
+    company_file = request.files['company_file1']
+
+    # If user does not select file, browser also submits an empty part without filename
+    if contact_file.filename == '' or company_file.filename == '':
+        return redirect(request.url)
+    
+    # Save the uploaded files
+    contact_filename = os.path.join(tempfile.mkdtemp(), contact_file.filename)
+    company_filename = os.path.join(tempfile.mkdtemp(), company_file.filename)
+    contact_file.save(contact_filename)
+    company_file.save(company_filename)
+
+    contacts_df = pd.read_csv(contact_filename, skip_blank_lines=True)
+    companies_df = pd.read_csv(company_filename, skip_blank_lines=True)
+    print("companies_df",companies_df.columns)
+    # Remove rows with all NaN values
+    contacts_df.dropna(how='all', inplace=True)
+    companies_df.dropna(how='all', inplace=True)
+
+    # Merge based on the matching Company column
+    merged_df = pd.merge(contacts_df, companies_df, on='Company Name')
+    print("merged_df",merged_df.columns)
+    merged_df.insert(0, 'Serial Number', range(1, len(merged_df) + 1))
+    merged_df['Work Email 2 new'] = merged_df['Work Email 2'].str.replace('❌ No Email Found', '')
+    merged_df['Work Email 2 new'] = merged_df['Work Email 2 new'].str.replace('✅ ', '')
+    
+    final_df = pd.DataFrame({
+        ' ': merged_df['Serial Number'],
+        'recipient': merged_df['First Name'],
+        'mobile_number': np.nan,  # Blank for now
+        # 'email': merged_df['Email - Person'],       
+        'email': merged_df['Work Email 1'].fillna(merged_df['Work Email 2 new']),
+        'unique_id': np.random.randint(100000, 999999, size=len(merged_df)),  # Random number generator
+        'name': merged_df['First Name'],
+        'designation': merged_df['Designation'],
+        'pow': merged_df['Company Name'],
+        'jt': merged_df['Job Title'],
+        'Company URL': merged_df['Company Domain'],
+        'ApTask Scroll': 'https://www.aptask.com/'
+    })
+
+    # Create a response object with the CSV data
+    csv_data = final_df.to_csv(index=False)
+    response = make_response(csv_data)
+    response.headers['Content-Type'] = 'text/csv'
+    response.headers['Content-Disposition'] = 'attachment; filename=ResultW/oLinkedin.csv'
+
+    return response
+
 if __name__ == '__main__':
     app.run(debug=True)

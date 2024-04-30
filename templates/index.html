@@ -13,7 +13,7 @@
         }
 
         .container {
-            width: 800px;
+            width: 1200px;
             margin: 50px auto;
             background-color: #fff;
             border-radius: 10px;
@@ -100,9 +100,20 @@
         <div class="column">
             <h2>CSV Instantly</h2>
             <form action="/process_csv" method="post" enctype="multipart/form-data">
+             <label for="file">Upload CSV:</label>
             <input type="file" name="file" accept=".csv"><br>
             <button type="submit">Generate csv</button>
         </form>
+        </div>
+        <div class="column">
+            <h2>CSV without Linkedin</h2>
+            <form action="/process_csv_without_linkedin" method="post" enctype="multipart/form-data">
+                <label for="contact_file">Upload Contact Details CSV:</label>
+                <input type="file" id="contact_file1" name="contact_file1" accept=".csv"><br>
+                <label for="company_file">Upload Company Details CSV:</label>
+                <input type="file" id="company_file1" name="company_file1" accept=".csv"><br>
+                <button type="submit">Create CSV</button>
+            </form>
         </div>
     </div>
 
